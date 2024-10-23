@@ -81,7 +81,7 @@ app.patch("/user", async (req, res) => {
     await User.findByIdAndUpdate({ _id: userId }, data)
     res.send("User Updated successfully")
   } catch (error) {
-    res.status(400).send("Something Went Wrong")
+    res.status(400).send("Something Went Wrong!!")
   }
 })
 
