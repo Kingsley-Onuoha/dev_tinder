@@ -4,6 +4,7 @@ const authRouter = express.Router();
 const { validateSignupData } = require("../utils/validation");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
+const { isStrongPassword } = require("validator");
 
 authRouter.post("/signup", async (req, res) => {
   const { firstName, lastName, emailId, password, age } = req.body;
@@ -33,9 +34,8 @@ authRouter.post("/signup", async (req, res) => {
 });
 
 authRouter.post("/login", async (req, res) => {
-  
-    try {
-        const { emailId, password } = req.body;
+  try {
+    const { emailId, password } = req.body;
 
     //Authenticating if email used to login is in our DB
     const user = await User.findOne({
@@ -46,7 +46,7 @@ authRouter.post("/login", async (req, res) => {
       throw new Error("Invalid Credentials");
     }
     //comparing if the password matches with that of the user in DB
-    const isPasswordValid = await user.validatePassword;
+    const isPasswordValid = await user.validatePassword(password);
 
     if (isPasswordValid) {
       //Generating token
@@ -64,6 +64,13 @@ authRouter.post("/login", async (req, res) => {
   } catch (error) {
     res.status(400).send("Error: " + error.message);
   }
+});
+
+authRouter.post("/logout", async (req, res) => {
+  res.cookie("token", null, {
+    expires: new Date(Date.now()),
+  });
+  res.send("Successfully Logged Out");
 });
 
 module.exports = authRouter;
